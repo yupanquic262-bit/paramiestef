@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti ❤️</title>
+    <!-- Cargando Tailwind CSS para la estructura responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cargando fuente Quicksand para un estilo dulce y moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #070308; /* Fondo muy oscuro, casi negro con un toque violeta/rosa */
+            overflow: hidden; /* Oculta todo lo que salga de la pantalla (corazones flotantes) */
+            height: 100vh;
+            width: 100vw;
+            color: #ffffff;
+        }
+
+        .neon-border {
+            border: 2px solid #ff1493;
+            box-shadow: 0 0 10px #ff1493, inset 0 0 15px rgba(255, 20, 147, 0.5);
+            background: rgba(20, 5, 15, 0.85); /* Fondo oscuro semitransparente para la tarjeta */
+            backdrop-filter: blur(10px);
+        }
+
+        .neon-text {
+            color: #ffe6f2; /* Blanco rosado */
+            text-shadow: 0 0 5px #ff1493, 0 0 15px #ff1493, 0 0 30px #ff1493;
+        }
+
+        .neon-button {
+            background-color: #ff1493;
+            color: white;
+            text-shadow: 0 0 5px rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px #ff1493, 0 0 30px #ff1493;
+            transition: all 0.3s ease;
+        }
+
+        .neon-button:hover, .neon-button:active {
+            background-color: #ff007f;
+            box-shadow: 0 0 20px #ff007f, 0 0 40px #ff007f;
+            transform: scale(0.95);
+        }
+
+        .card-wrapper {
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+        }
+
+        .card-hidden {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+        }
+
+        .card-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .floating-item {
+            position: absolute;
+            bottom: -10vh; /* Comienza fuera de la pantalla abajo */
+            pointer-events: none; /* Para que no interfiera con los clics */
+            animation: floatUp linear forwards;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .heart-item {
+            color: #ff1493;
+            text-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+        }
+
+        .phrase-item {
+            color: #ffb3d9;
+            font-weight: 700;
+            text-shadow: 0 0 8px #ff1493, 0 0 15px #ff1493;
+            white-space: nowrap;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.8; /* Aparece suavemente */
+            }
+            85% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-120vh) rotate(360deg);
+                opacity: 0; /* Desaparece suavemente arriba */
+            }
+        }
+        
+        /* Animación suave para el ícono principal */
+        @keyframes gentle-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .icon-bounce {
+            animation: gentle-bounce 3s infinite ease-in-out;
+            text-shadow: 0 0 20px #ff1493;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center relative">
+
+    <div id="background-container" class="absolute inset-0 z-0">
+        <!-- Los corazones y frases se generarán aquí mediante JavaScript -->
+    </div>
+
+    <main class="relative z-10 w-11/12 max-w-sm sm:max-w-md mx-auto">
+        <div id="surprise-card" class="neon-border rounded-3xl p-8 sm:p-10 flex flex-col items-center text-center card-wrapper card-visible">
+            
+            <!-- Ícono decorativo -->
+            <div class="text-6xl mb-6 icon-bounce" id="card-icon">
+                💌
+            </div>
+
+            <!-- Texto de la tarjeta -->
+            <h1 id="card-text" class="text-2xl sm:text-3xl font-bold mb-10 leading-snug neon-text min-h-[100px] flex items-center justify-center">
+                <!-- El texto dinámico se insertará aquí -->
+            </h1>
+
+            <!-- Botón de acción -->
+            <button id="next-btn" class="neon-button w-full font-bold py-4 px-6 rounded-full text-lg sm:text-xl tracking-wide outline-none">
+                <!-- El texto del botón se insertará aquí -->
+            </button>
+
+        </div>
+    </main>
+
+    <script>
+        const storySteps = [
+            {
+                text: "¿Quieres ver algo realmente hermoso?",
+                btnText: "Sí, quiero 💖",
+                icon: "💌"
+            },
+            {
+                text: "Sigue estos pasos...",
+                btnText: "Siguiente ✨",
+                icon: "👣"
+            },
+            {
+                text: "Abre la cámara de tu celular",
+                btnText: "Listo 📸",
+                icon: "📱"
+            },
+            {
+                text: "Pon la cámara en reversa",
+                btnText: "Ya está 🤳",
+                icon: "🔄"
+            },
+            {
+                text: "¡Mira tú pantalla, ahora puedes ver lo hermosa que eres mi amor te amo mucho mi estefi! ✨💖",
+                btnText: "Te amo 💕",
+                icon: "😍"
+            }
+        ];
+
+        let currentStepIndex = 0;
+        
+        // Elementos del DOM
+        const cardElement = document.getElementById('surprise-card');
+        const cardTextElement = document.getElementById('card-text');
+        const cardIconElement = document.getElementById('card-icon');
+        const nextButton = document.getElementById('next-btn');
+        const bgContainer = document.getElementById('background-container');
+
+        function renderStep() {
+            const step = storySteps[currentStepIndex];
+            cardTextElement.innerHTML = step.text;
+            nextButton.innerText = step.btnText;
+            cardIconElement.innerText = step.icon;
+        }
+
+        nextButton.addEventListener('click', () => {
+            // 1. Ocultar la tarjeta actual
+            cardElement.classList.remove('card-visible');
+            cardElement.classList.add('card-hidden');
+
+            // 2. Esperar que termine la animación, cambiar contenido y volver a mostrar
+            setTimeout(() => {
+                currentStepIndex++;
+
+                // Si llega al final de la historia, reiniciamos o nos quedamos ahí
+                if (currentStepIndex >= storySteps.length) {
+                    currentStepIndex = 0; // Reinicia el ciclo
+                }
+
+                renderStep();
+
+                // Mostrar nueva tarjeta
+                cardElement.classList.remove('card-hidden');
+                cardElement.classList.add('card-visible');
+            }, 400); // 400ms coincide con la transición CSS
+        });
+
+        const romanticPhrases = [
+            "Te amo mi estefi", 
+            "Eres hermosa mi flor", 
+            "Mi princesa estef", 
+            "Mi vida estefi", 
+            "Preciosa estefi",
+            "Me encantas mi amor"
+        ];
+
+        function spawnFloatingElement() {
+            const el = document.createElement('div');
+            el.classList.add('floating-item');
+
+            // Decidir aleatoriamente si es una frase o un corazón (30% de probabilidad de frase)
+            const isPhrase = Math.random() < 0.3;
+
+            if (isPhrase) {
+                el.classList.add('phrase-item');
+                // Escoger una frase aleatoria
+                const randomPhrase = romanticPhrases[Math.floor(Math.random() * romanticPhrases.length)];
+                el.innerText = randomPhrase;
+                
+                // Tamaño de letra entre 1rem y 1.5rem para frases
+                el.style.fontSize = (Math.random() * 0.5 + 1) + 'rem';
+                
+                // Rotación suave (-15deg a 15deg)
+                el.style.transform = `rotate(${(Math.random() - 0.5) * 30}deg)`;
+            } else {
+                el.classList.add('heart-item');
+                el.innerText = '💖';
+                
+                // Tamaño de letra entre 1.5rem y 3rem para corazones
+                el.style.fontSize = (Math.random() * 1.5 + 1.5) + 'rem';
+            }
+
+            // Posición horizontal aleatoria (0% a 90% del ancho de la pantalla)
+            el.style.left = (Math.random() * 90) + 'vw';
+
+            // Duración aleatoria de la animación (entre 8s y 15s para que suban lentamente)
+            const animationDuration = Math.random() * 7 + 8;
+            el.style.animationDuration = animationDuration + 's';
+
+            bgContainer.appendChild(el);
+
+            // Eliminar el elemento del DOM una vez que termina su animación
+            setTimeout(() => {
+                if(bgContainer.contains(el)) {
+                    el.remove();
+                }
+            }, animationDuration * 1000);
+        }
+
+        // Crear un elemento flotante cada 600ms
+        setInterval(spawnFloatingElement, 600);
+
+        // Generar algunos elementos inmediatamente para que el fondo no esté vacío al inicio
+        for(let i = 0; i < 8; i++) {
+            setTimeout(spawnFloatingElement, i * 200);
+        }
+
+        // Renderizar el primer paso al cargar
+        renderStep();
+    </script>
+</body>
+</html>
